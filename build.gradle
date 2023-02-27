@@ -1,0 +1,330 @@
+import org.gradle.internal.os.OperatingSystem
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url 'https://repo.spring.io/libs-snapshot' }
+        maven { url 'https://repo.spring.io/libs-milestone' }
+        maven { url "https://repo.spring.io/plugins-release" }
+        maven { url "https://repo.spring.io/milestone" }
+    }
+    dependencies {
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.5"
+        classpath "net.ltgt.gradle:gradle-apt-plugin:0.15"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${spring_boot_version}"
+        classpath "io.spring.gradle:propdeps-plugin:0.0.9.RELEASE"
+        classpath "org.hidetake:gradle-ssh-plugin:2.9.0"
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '4.9.6')
+        //classpath "io.spring.gradle:dependency-management-plugin:0.6.1.RELEASE"
+
+        //jhipster-needle-gradle-buildscript-dependency - JHipster will add additional gradle build script plugins here
+    }
+}
+/*
+
+plugins {
+    id "org.sonarqube" version "2.5"
+    id "net.ltgt.apt" version "0.11"
+    id "io.spring.dependency-management" version "1.0.3.RELEASE"
+    //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
+}
+*/
+
+apply plugin: 'java'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+apply plugin: 'maven'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'war'
+apply plugin: 'propdeps'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: "net.ltgt.apt"
+//apply plugin: 'idea'
+dependencyManagement {
+    imports {
+        mavenBom 'io.github.jhipster:jhipster-dependencies:' + jhipster_dependencies_version
+        mavenBom 'org.springframework.cloud:spring-cloud-dependencies:' + spring_cloud_version
+    }
+}
+defaultTasks 'bootRun'
+
+group = 'com.idevhub.crypto'
+version = '1.07'
+
+description = ''
+
+bootWar {
+    mainClassName = 'com.idevhub.crypto.CryptoserviceApp'
+}
+
+war {
+
+}
+
+springBoot {
+    mainClassName = 'com.idevhub.crypto.CryptoserviceApp'
+    //executable = true
+    buildInfo()
+}
+
+if (OperatingSystem.current().isWindows()) {
+    task pathingJar(type: Jar) {
+        dependsOn configurations.runtime
+        appendix = 'pathing'
+
+        doFirst {
+            manifest {
+                attributes 'Class-Path': configurations.runtime.files.collect {
+                    it.toURL().toString().replaceFirst(/file:\/+/, '/').replaceAll(' ', '%20')
+                }.join(' ')
+            }
+        }
+    }
+
+    bootRun {
+        dependsOn pathingJar
+        doFirst {
+            classpath = files("$buildDir/classes/java/main", "$buildDir/resources/main", pathingJar.archivePath)
+        }
+    }
+}
+
+test {
+    include '**/*UnitTest*'
+    include '**/*IntTest*'
+
+    // uncomment if the tests reports are not generated
+    // see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
+    // ignoreFailures true
+    reports.html.enabled = false
+}
+
+task testReport(type: TestReport) {
+    destinationDir = file("$buildDir/reports/tests")
+    reportOn test
+}
+
+
+apply from: 'gradle/docker.gradle'
+apply from: 'gradle/sonar.gradle'
+apply from: 'gradle/liquibase.gradle'
+apply from: 'gradle/mapstruct.gradle'
+
+//jhipster-needle-gradle-apply-from - JHipster will add additional gradle scripts to be applied here
+
+
+if (project.hasProperty('prod')) {
+    apply from: 'gradle/profile_prod.gradle'
+} else if (project.hasProperty('vf_owned_stage')) {
+    apply from: 'gradle/profile_vf_owned_stage.gradle'
+} else if (project.hasProperty('testserver')) {
+    apply from: 'gradle/profile_testserver.gradle'
+} else if (project.hasProperty('devserver')) {
+    apply from: 'gradle/profile_devserver.gradle'
+} else if (project.hasProperty('devserver_v2')) {
+    apply from: 'gradle/profile_devserver_v2.gradle'
+} else if (project.hasProperty('life_prod')) {
+    apply from: 'gradle/profile_life_prod.gradle'
+} else if (project.hasProperty('life_dev')) {
+    apply from: 'gradle/profile_life_dev.gradle'
+} else{
+    apply from: 'gradle/profile_dev.gradle'
+}
+
+
+if (project.hasProperty('graphite')) {
+    apply from: 'gradle/graphite.gradle'
+}
+
+if (project.hasProperty('prometheus')) {
+    apply from: 'gradle/prometheus.gradle'
+}
+
+if (project.hasProperty('zipkin')) {
+    apply from: 'gradle/zipkin.gradle'
+}
+
+
+configurations {
+    providedRuntime
+    compile.exclude module: "spring-boot-starter-tomcat"
+    // netty's native is pulled by spring-cloud-starter-ribbon, but is useless unless you explicitly add the native binary dependency.
+    // Having it in the classpath without the binary can cause warnings
+    //all*.exclude group: 'io.netty', module: 'netty-transport-native-epoll'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+    maven { url "http://artifactory/artifactory/libs-release-local/" }
+    maven { url 'https://repo.spring.io/libs-snapshot' }
+    maven { url 'https://repo.spring.io/libs-milestone' }
+    maven { url 'http://repo.spring.io/milestone' }
+    maven { url 'http://repo.spring.io/snapshot' }
+    maven { url 'https://repository.jboss.org/nexus/content/repositories/releases' }
+    maven { url 'https://oss.sonatype.org/content/repositories/releases' }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url 'http://repo.maven.apache.org/maven2' }
+}
+
+dependencies {
+    compile project(':model-crypto')
+
+    compile(group: 'com.idevhub.cryptomobileid', name: 'cryptomobileid', version: '3.3.24')
+    compile "com.idevhub:mob-protocol-platform:1.11"
+
+    compile "io.jsonwebtoken:jjwt:${jjwt_version}"
+
+    compile group: "io.github.jhipster", name: "jhipster-framework"
+    compile "javax.xml.bind:jaxb-api"
+    compile "org.springframework.boot:spring-boot-starter-cache"
+    compile "io.dropwizard.metrics:metrics-core:${dropwizard_metrics_version}"
+    compile "io.dropwizard.metrics:metrics-jcache:${dropwizard_metrics_version}"
+    compile "io.dropwizard.metrics:metrics-jvm:${dropwizard_metrics_version}"
+    compile "io.dropwizard.metrics:metrics-servlet:${dropwizard_metrics_version}"
+    compile "io.dropwizard.metrics:metrics-json:${dropwizard_metrics_version}"
+    compile "io.dropwizard.metrics:metrics-servlets:${dropwizard_metrics_version}"
+    compile("net.logstash.logback:logstash-logback-encoder:${logstash_logback_encoder_version}") {
+        exclude(group: 'ch.qos.logback')
+    }
+
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-json-org"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-hppc"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-jsr310"
+    compile "com.fasterxml.jackson.datatype:jackson-datatype-hibernate5"
+    compile "com.fasterxml.jackson.core:jackson-annotations"
+    compile "com.fasterxml.jackson.core:jackson-databind"
+    compile "com.fasterxml.jackson.module:jackson-module-afterburner"
+    compile "com.ryantenney.metrics:metrics-spring"
+
+    compile "javax.cache:cache-api"
+    compile "org.hibernate:hibernate-core"
+    compile "com.zaxxer:HikariCP"
+    compile "org.apache.commons:commons-lang3"
+    compile "commons-io:commons-io"
+    compile "javax.transaction:javax.transaction-api"
+    compile "org.ehcache:ehcache"
+    compile "org.hibernate:hibernate-jcache"
+    compile "org.hibernate:hibernate-entitymanager"
+    compile "org.hibernate:hibernate-envers"
+    compile "org.hibernate.validator:hibernate-validator"
+    compile "org.liquibase:liquibase-core"
+    compile "com.mattbertolini:liquibase-slf4j"
+
+
+    compile "org.springframework.boot:spring-boot-actuator"
+    compile "org.springframework.boot:spring-boot-autoconfigure"
+    compile "org.springframework.boot:spring-boot-loader-tools"
+    compile "org.springframework.boot:spring-boot-starter-mail"
+    compile "org.springframework.boot:spring-boot-starter-logging"
+    compile "org.springframework.boot:spring-boot-starter-aop"
+    compile "org.springframework.boot:spring-boot-starter-data-jpa"
+    compile "org.springframework.boot:spring-boot-starter-security"
+    compile("org.springframework.boot:spring-boot-starter-web") {
+        exclude module: 'spring-boot-starter-tomcat'
+    }
+    compile "org.springframework.boot:spring-boot-starter-undertow"
+    compile "org.springframework.boot:spring-boot-starter-thymeleaf"
+    compile "org.zalando:problem-spring-web"
+
+    compile "org.springframework.cloud:spring-cloud-starter"
+    compile "org.springframework.cloud:spring-cloud-starter-netflix-ribbon"
+    compile "org.springframework.cloud:spring-cloud-starter-netflix-hystrix"
+
+    //compile "org.springframework.cloud:spring-cloud-starter-spectator"
+    compile "org.springframework.retry:spring-retry"
+
+    compile "org.springframework.cloud:spring-cloud-starter-netflix-eureka-client"
+    compile "org.springframework.cloud:spring-cloud-starter-config"
+
+    compile "org.springframework.cloud:spring-cloud-security"
+    compile "org.springframework.cloud:spring-cloud-starter-openfeign"
+
+    compile "org.springframework.boot:spring-boot-starter-cloud-connectors"
+    compile("org.springframework:spring-context-support")
+    compile "org.springframework.security:spring-security-config"
+    compile "org.springframework.security:spring-security-data"
+    compile "org.springframework.security:spring-security-web"
+    compile "org.springframework.security.oauth:spring-security-oauth2:${spring_security_oauth2_version}"
+    compile "org.springframework.security:spring-security-jwt"
+
+
+    compile("io.springfox:springfox-swagger2:${springfox_version}") {
+        exclude module: 'mapstruct'
+    }
+    compile "io.springfox:springfox-bean-validators"
+    compile "org.postgresql:postgresql"
+    compile "org.mapstruct:mapstruct-jdk8:${mapstruct_version}"
+
+    //testCompile "org.awaitility:awaitility:${awaitility_version}"
+    testCompile "com.jayway.jsonpath:json-path"
+    testCompile("org.springframework.boot:spring-boot-starter-test") {
+        exclude group: 'com.vaadin.external.google', module: 'android-json'
+    }
+
+    testCompile project(':model-crypto')
+
+    testCompile "org.springframework.security:spring-security-test"
+    testCompile "org.springframework.boot:spring-boot-test"
+    testCompile "org.assertj:assertj-core"
+    testCompile "junit:junit"
+    testCompile "org.mockito:mockito-core"
+    testCompile "com.mattbertolini:liquibase-slf4j"
+    testCompile "org.hamcrest:hamcrest-library"
+    testCompile "com.h2database:h2"
+    testCompile "org.springframework.cloud:spring-cloud-stream-test-support"
+/*    optional ("org.springframework.boot:spring-boot-configuration-processor:${spring_boot_version}") {
+        exclude group: 'com.vaadin.external.google', module: 'android-json'
+    }*/
+
+    compile "org.springframework.boot:spring-boot-starter-validation:${spring_boot_version}"
+    //jhipster-needle-gradle-dependency - JHipster will add additional dependencies here
+}
+
+tasks.processResources.doFirst {
+    project.configurations.compile.find {
+        if (it.name.startsWith("cryptomobileid")) {
+            println it.toString() + ' -> is found'
+
+            String zip = it.toString()
+            // extract libraries
+            copy {
+                from zipTree(zip)
+                into 'src/main/resources/'
+                include "*.so", "*.dll"
+            }
+            println "  --> extract \"libqb_crypto_hlp.so\" and \"libqb_crypto_hlp.dll\" to the project root"
+            // extract crypto configs
+            copy {
+                from zipTree(zip)
+                into 'src/main/resources/'
+                include "primary_context_*.xml"
+            }
+            println "  --> extract \"primary_context_(L|W).xml\" to the project root"
+        }
+    }
+}
+
+clean {
+    delete "target"
+}
+
+task cleanResources(type: Delete) {
+    delete 'build/resources'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.6'
+}
+
+task stage(dependsOn: 'bootWar') {
+}
+
+compileJava.dependsOn processResources
+processResources.dependsOn cleanResources, bootBuildInfo
+bootBuildInfo.mustRunAfter cleanResources
+

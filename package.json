@@ -1,0 +1,6 @@
+{
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "generator-jhipster": "4.10.1"
+  }
+}

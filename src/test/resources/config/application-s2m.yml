@@ -1,0 +1,4 @@
+jhipster:
+    swagger:
+        contactName: com.idevhub.crypto
+        contactEmail: com.idevhub.crypto@example.org

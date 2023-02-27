@@ -1,0 +1,3 @@
+rootProject.name = 'cryptoservice'
+include 'model-crypto'
+

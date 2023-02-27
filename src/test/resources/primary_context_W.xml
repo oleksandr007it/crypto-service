@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <!--  Версия файла настроек-->
+    <Version version="0.1.0.0"/>
+    <PKI>
+        <TokenManager>
+            <PrivateKeys>
+                <!--Система поддерживает следующие типы ключей: «Согласование ключей» - (08); “Цифровая подпись, Неотрекаемость” - (c0)/-->
+                <PrivateKey>
+                    <SubjectIdentifier>00C5B0617EE63989BCACB4C513DC399EF6D4E3DEC4472F415965FD91A2DCD6D6</SubjectIdentifier>
+                    <KeyUsage>C0</KeyUsage>
+                    <ContainerType type="PKCS8" pkcs5="123"/>
+                </PrivateKey>
+                <PrivateKey>
+                    <SubjectIdentifier>F3CC781617850472F084E8A8944D206D48D37A3679A35F0646D4649D908BFE27</SubjectIdentifier>
+                    <KeyUsage>08</KeyUsage>
+                    <ContainerType type="PKCS8" pkcs5="123"/>
+                </PrivateKey>
+                <Path>c:\tmp</Path>
+            </PrivateKeys>
+        </TokenManager>
+        <!--  Уровень логирования: none; fatal; error; warning; info; debug; trace -->
+        <Log level="none"/>
+        <Integrity>
+            <modules>
+                <!-- QBT-DSTU28147 check="?" extension="Lib" path="D:\Project\QBT-CryptoLab\x64\Release\"/-->
+                <!-- QBT-DSTU34311 check="?" extension="Lib" path="D:\Project\QBT-CryptoLab\x64\Release\"/-->
+                <!-- QBT-DSTU4145 check="?" extension="Lib" path="D:\Project\QBT-CryptoLab\x64\Release\"/-->
+                <!-- <QBT-KAM check="?" extension="Lib" path="D:\Project\QBT-CryptoLab\x64\Release\"/-->
+                <!-- <QBT-PRNG check="?" extension="Lib" path="D:\Project\QBT-CryptoLab\x64\Release\"/-->
+                <!-- <QBT-TSP check="?" extension="Lib" path="D:\Project\QBT-CryptoLab\x64\Release\"/-->
+                <!-- <QBT-PKI check="?" extension="Lib" path="D:\Project\QBT-CryptoLab\x64\Release\"/-->
+                <!-- <QBT-CRL check="?" extension="Lib" path="D:\Project\QBT-CryptoLab\x64\Release\"/-->
+                <!-- <QBT-OCSP check="?" extension="Lib" path="D:\Project\QBT-CryptoLab\x64\Release\"/-->
+                <!-- <QBT-PKCS8 check="?" extension="Lib" path="D:\Project\QBT-CryptoLab\x64\Release\"/-->
+                <!-- <QBT-KAM check="?" extension="Lib" path="D:\Project\QBT-CryptoLab\x64\Debug\"/-->
+                <!-- <QBT-PRNG check="?" extension="Lib" path="D:\Project\QBT-CryptoLab\x64\Debug\"/-->
+                <!-- QBT-TSP check="?" extension="Lib" path="D:\Project\QBT-CryptoLab\x64\Debug\"/-->
+                <!-- QBT-PKI check="?" extension="Lib" path="D:\Project\QBT-CryptoLab\x64\Debug\"/-->
+                <!-- QBT-CRL check="?" extension="Lib" path="D:\Project\QBT-CryptoLab\x64\Debug\"/-->
+                <!-- QBT-OCSP check="?" extension="Lib" path="D:\Project\QBT-CryptoLab\x64\Debug\"/-->
+                <!-- QBT-PKCS8 check="?" extension="Lib" path="D:\Project\QBT-CryptoLab\x64\Debug\"/-->
+            </modules>
+            <!-- В данной версии мы поддреживаем контроль целостности только с использованием стандарта ДСТУ 34311-->
+            <ProtectionMechanisms mechanisms="DSTU34311"/>
+        </Integrity>
+        <!--  Уровень логирования: none; fatal; error; warning; info; debug; trace -->
+        <Log level="none"/>
+        <Repository>
+            <!--Путь к хранилищу сертификатов-->
+            <Certificates path="c:\tmp"/>
+            <!--Certificates path="/tmp/Certificates/test/"/-->
+            <!--Настройка хранилища сертификатов-->
+            <CRLs path="c:\tmp" saveDownloadedCrl="TRUE"/>
+        </Repository>
+        <CMS>
+            <!--Выбор протокола представления подписанных/зашифрованных данных, текущая версия поддерживает:-->
+            <!--"1.2.840.113549.1.7.2" - конверт подписанных данных; 1.2.804.2.1.1.1.1.2.1 - ДСТУ4145 без доп преобразований -->
+            <!--"1.2.840.113549.1.7.3" - конверт зашифрованных данных; 1.2.804.2.1.1.1.1.1.1.3 - ДСТУ28147 без доп преобразований -->
+            <!--PKCS7 signedData="1.2.804.2.1.1.1.1.2.1" envelopedData="1.2.804.2.1.1.1.1.1.1.3"/-->
+            <PKCS7 signedData="1.2.840.113549.1.7.2" envelopedData="1.2.840.113549.1.7.3"/>
+            <!--  Секция отвечает за принятие решения по следующему вопросу: вкладывать сертификат в конверт подписи, или конверт шифрования-->
+
+            <!--  Секция отвечает за принятие решения по следующему вопросу: использовать метку времени для конверта подписи, конверта шифрования-->
+            <!--  contentTimeStamp="sign" В процессе наложения подписи обратится к сервису метки времени, и добавить метку времени в подпись.-->
+            <!--  contentTimeStamp="sign" OR contentTimeStamp="encrypt" OR contentTimeStamp="encrypt-sign" -->
+            <!--  verifyStampSign="TRUE" проверять подпись под полученной меткой времени-->
+            <!--TimeStamp contentTimeStamp="SIGN" verifyStampSign="TRUE"/-->
+            <!--  Разрешенные схемы шифрования. static - статическая схема, dynamic - динамическая схема -->
+            <EncryptionScheme encryptionScheme="static" decryptionScheme="static"/>
+            <!--  Способ кодирования данных, на текущий момент возможны два способа: external (внешнее) и internal (внутренее) кодирование -->
+            <DataEncoding signature="internal"/>
+            <!--DataEncoding signature=external""/-->
+            <!--  Тип формата конверта подписи. Возможны следующие варианты: CAdES-BES, CAdES-EPES, CAdES-C, CAdES-X Long-->
+            <!--  В настоящее время мы планируем поддерживать CAdES-BES, CAdES-EPES -->
+            <SignatureFormat format="CAdES-EPES"/>
+            <!--  Атрибут, що містить час обчислення цифрового підпису, який заявляється підписувачем -->
+            <SigningTime signingTime="TRUE"/>
+            <!--  атрибут, що містить позначку часу відносно даних, що підписуються. -->
+            <!--Зазначений атрибут дозволяє забезпечити доказ того, що дані, стосовно яких обчислюється підпис, існували до моменту формування підпису-->
+            <ContentTimeStamp timeStamp="FALSE"/>
+            <!--  Атрибут, що вказує на політику підпису, дотримання якої є обов’язковим під час формування та перевірки ЕЦП -->
+            <SignaturePolicyIdentifier signaturePolicy="FALSE"/>
+            <!--  Получатели зашифроыванных данных (те кто смогут расшифровать)-->
+            <RecipientsInfo>
+                <KAUserCertificate publicKey="4C32C1764E815F8370A5FD20AA00CA95B46542E1F93A28EB99879AED35CF8F15" algorithm="1.2.804.2.1.1.1.1.3.1.1"/>
+                <!--KAUserCertificate recipientCert="DEF4C5557C187790039795221E0656D247A6BB8ED3A40CD011AD1FC7B17D861C" algorithm="1.2.804.2.1.1.1.1.3.1.1"/-->
+                <!--KAUserCertificate recipientCert="B96D72FADF69C8024C68AE32583E739C7F9FFC04A1546718524BCC9255F6AF8F" algorithm="1.2.804.2.1.1.1.1.3.1.1"/-->
+                <!--KAUserCertificate recipientCert="D360EF862359144A7476DB811CD19DF0F841EA09CB31263C59BA259B4DED5E72" algorithm="1.2.804.2.1.1.1.1.3.1.1"/-->
+                <!--KAUserCertificate recipientCert="BC35146C8656AA6D39F4DD2E8A765BD9BBF7A57B21970CF9597FB64A984216C1" algorithm="1.2.804.2.1.1.1.1.3.1.1"/-->
+            </RecipientsInfo>
+            <!-- НЕПОДДЕРЖИВАЕМЫЙ В ДАННОЙ ВЕРСИИ ФУНКЦИОНАЛ -->
+            <!-- флаги обязуют принимать данные только в формате PKCS7, при отсутствии этих флагов обрабаываются даные обоих видов-->
+            <!--PKCS7 SIGN="FALSE" ENCRYPT="FALSE" VERIFY="FALSE" DECRYPT="FALSE"/-->
+            <!-- Политика проверки состояния сертификата-->
+            <PolicyCheckCertificateStatus>
+                <!-- Проверить состояние сертификата в роцессе наложения подписи-->
+                <PolicySignature>TRUE</PolicySignature>
+                <!-- Проверить состояние сертификата в роцессе проверки подписи - проверяется состояние только сертификата подписанта-->
+                <PolicyVerification>TRUE</PolicyVerification>
+                <!-- Политика проверки состояния сертификата в процессе зашифрования сообщения - проверяется только состояние сертификата отправителя-->
+                <PolicyEncryption>TRUE</PolicyEncryption>
+                <!-- Восстанавливать цепочку сертификации вплоть до корневого, useStatusProtocol флаг отвечает за проверку каждого сертификата в цепочке по протоколу указанном в StatusProtocol -->
+
+                <!--2.5.29.31 - using  Certificate Revocation List (CRL) http://oid-info.com/get/2.5.29.31 -->
+                <!--1.3.6.1.5.5.7.48.1 - using     Online Certificate Status Protocol (OCSP) http://oid-info.com/get/1.3.6.1.5.5.7.48.1 -->
+                <StatusProtocol>1.3.6.1.5.5.7.48.1</StatusProtocol>
+                <VerifyCertificationChain verifyChain="TRUE" useStatusProtocol="FALSE" cash_time_period="50"/>
+            </PolicyCheckCertificateStatus>
+            <Certificate signature="TRUE"/>
+            <SignerInfo signerId="CERT_ID_ISSUER_SERIAL_NUMBER" />
+        </CMS>
+        <CRL>
+            <!-- UseCrlForCheckCert - флаг отвечает за проверку валидности сертификатов по спискам отозванных сертификатов -->
+            <!-- Если флаг UseCrlForCheckCert установлен в FALSE все остальные флаги тега "CRL" игнорируются, и метод проверки по CRL всегда возращает TRUE -->
+            <!-- UseCrlForCheckCert = TRUE инициализация объекта crl и др. операции не производятся -->
+            <UseCrlForCheckCert>FALSE</UseCrlForCheckCert>
+            <!--В процессе инициализации объекта поднять свс из хранилища-->
+            <!--Значение = TRUE говорит о том что при инициализации объекта необходимо с диского хранилища подтянуть все имеющиеся CRL-->
+            <InitializeValueFromCach>TRUE</InitializeValueFromCach>
+            <!-- Идентификаторы ключей для которых необходимо вытянуть СВС в процессе инициализации сисетмы -->
+            <DistribPoints>
+                <!--PublicKey>DEF4C5557C187790039795221E0656D247A6BB8ED3A40CD011AD1FC7B17D861C</PublicKey-->
+                <PublicKey>B7C7394AD5E1B837C4F60FBFAC01F879E3A86A9ED1283A908817C111A29ACA95</PublicKey>
+            </DistribPoints>
+        </CRL>
+        <OCSP>
+            <!-- Название приложения от имени которого будет выполнено образщение к сервису метки времени -->
+            <AgentName agent="qbt-crypto-v1"/>
+            <!-- Домен OCSP сервиса от которого нужно получить метку времени -->
+            <!-- Если в каччестве имени передать пустую строку: domain="" - путь будет получен из сертификата -->
+            <!--DomainName domain="http://10.15.31.109/"/-->
+            <!--DomainName domain="http://ocsp.altersign.com.ua/"/-->
+            <DomainName domain=""/>
+            <!--DomainName domain="http://ocsp.masterkey.ua/services/ocsp/"/-->
+            <!--DomainName domain="http://acskidd.gov.ua/services/ocsp/"/-->
+            <!-- Версия протокола, в Украине на момент разработки П.О. была актуальна версия № 1. согласно http://zakon3.rada.gov.ua/laws/show/z1402-12/paran4#n4 -->
+            <Version version="1"/>
+            <!-- Тип данных получаемых функцией CreateObject на вход, в текущей версии поддерживается только тип DATA - данные без дополнительных преобразований -->
+            <ObjectDataType type="DATA"/>
+            <!-- Тип объекта который необходимо созлать, поддерживаем RESPONSE, REQUEST -->
+            <ObjectType type="RESPONSE"/>
+            <!-- Сектор регламентирующий работу с сертификатами полученными посредством ocsp responce -->
+            <!-- allowCertsWork - разрешить анализ секции сертификатов добавленных в ocsp ответ  -->
+            <!-- verifyCertificate - поднятый флаг означает проверку целостности сертификата, восстановление цепочки сертификации, проверка по OCSP не осуществляется  -->
+            <!-- addInHardDriveRepository - сохранить полученные посредством ocsp response сертификатов в хранилище на винте  -->
+            <!-- addInMemoryRepository - сохранить полученные посредством ocsp response сертификатов в хранилище загруженное в пямять -->
+            <Certificate allowCertsWork="TRUE" verifyCertificate="TRUE" addInHardDriveRepository="TRUE" addInMemoryRepository="TRUE" />
+        </OCSP>
+        <TSP>
+            <!-- Название приложения от имени которого будет выполнено образщение к сервису метки времени -->
+            <AgentName agent="qbt-crypto-v1"/>
+            <!-- Домен TSP сервиса от которого нужно получить метку времени -->
+            <!--DomainName domain="http://ca.altersign.com.ua/services/tsp/"/-->
+            <!--DomainName domain="http://tsp.masterkey.ua/services/tsp/"/-->
+            <!--DomainName domain="http://acskidd.gov.ua/services/tsp/"/-->
+            <DomainName domain="http://acskidd.gov.ua/services/tsp/"/>
+            <!-- Версия протокола, в Украине на момент разработки П.О. была актуальна версия № 1. согласно http://zakon3.rada.gov.ua/laws/show/z1402-12/paran4#n4 -->
+            <TimeStampVersion version="1"/>
+            <!-- Тип данных получаемых функцией CreateObject на вход, в текущей версии поддерживается только тип DATA - данные без дополнительных преобразований -->
+            <!-- <ObjectDataType type="DATA"/-->
+            <!-- Тип объекта который необходимо созлать, поддерживаем RESPONSE, REQUEST RESPONSE-->
+            <!-- ObjectType type="RESPONSE"/-->
+        </TSP>
+        <LanguagePack>
+            <Language language="RU" path_to_language_pack="LanguagePack.xml"/>
+        </LanguagePack>
+    </PKI>
+</config>
+
