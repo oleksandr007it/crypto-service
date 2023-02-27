@@ -1,5 +1,6 @@
 Implemented 0-DSTU311 2-ECDSA.  Crypto algorithm. EDS encrypt and decrypt
-USE JNA fro cal C++ crypto Lib
+USE JNA for cal C++ crypto Lib function.
+The main implementation is C++
 
 ## Development
 
