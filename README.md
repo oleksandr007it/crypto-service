@@ -1,3 +1,6 @@
+Implemented 0-DSTU311 2-ECDSA.  Crypto algorithm. EDS encrypt and decrypt
+USE JNA fro cal C++ crypto Lib
+
 ## Development
 
 To start your application in the dev profile, simply run:
